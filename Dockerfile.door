@@ -1,0 +1,10 @@
+FROM caddy:2-alpine
+# 自带 xray, 运行时零第三方下载依赖(真·自己的服务)
+RUN apk add --no-cache unzip wget ca-certificates \
+ && wget -O /tmp/xray.zip https://github.com/XTLS/Xray-core/releases/latest/download/Xray-linux-64.zip \
+ && unzip -o /tmp/xray.zip xray -d /usr/local/bin/ \
+ && chmod +x /usr/local/bin/xray \
+ && rm -f /tmp/xray.zip
+COPY entrypoint-door.sh /entrypoint-door.sh
+RUN sed -i 's/\r$//' /entrypoint-door.sh && chmod +x /entrypoint-door.sh
+ENTRYPOINT ["/entrypoint-door.sh"]

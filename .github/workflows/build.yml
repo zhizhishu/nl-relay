@@ -34,3 +34,13 @@ jobs:
           push: true
           tags: |
             ghcr.io/${{ github.repository_owner }}/nl-relay:latest
+
+      - name: Build and push door image (caddy+xray, linux/amd64)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.door
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/nl-relay:door
