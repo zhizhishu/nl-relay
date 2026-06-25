@@ -48,5 +48,17 @@ echo "[6] 装到 /dev/vda (setup-disk sys 模式, 非交互)"
 export BOOTLOADER=grub
 yes | setup-disk -m sys -k virt /dev/vda
 
+echo "[7] 把公钥写进目标系统(关键: setup-disk -m sys 不拷 /root, 否则装完 SSH 公钥认证失败)"
+for p in /dev/vda3 /dev/vda2 /dev/vda1; do
+  [ -b "$p" ] || continue
+  mount "$p" /mnt 2>/dev/null || continue
+  if [ -e /mnt/etc/os-release ] && [ -d /mnt/root ]; then
+    mkdir -p /mnt/root/.ssh && chmod 700 /mnt/root/.ssh
+    echo "$PUBKEY" > /mnt/root/.ssh/authorized_keys && chmod 600 /mnt/root/.ssh/authorized_keys
+    echo "  ssh key -> $p (target root)"; umount /mnt; break
+  fi
+  umount /mnt 2>/dev/null
+done
+
 echo "[DONE] 安装完成, 即将 reboot 进入硬盘 Alpine"
 sync
