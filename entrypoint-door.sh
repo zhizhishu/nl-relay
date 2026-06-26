@@ -42,4 +42,12 @@ cat > /tmp/Caddyfile <<EOF
 EOF
 
 /usr/local/bin/xray run -c /tmp/xray.json &
+
+# 反向隧道: 容器主动拨 fr-relay 的 chisel 服务端(出站, 绕开"容器入站不支持"),
+# 在 fr-relay 上暴露 reverse socks → fr-relay 借本容器的法国 IPv4 出口。
+# 注入: CHISEL_SERVER(如 http://172.16.4.2:9999) + CHISEL_AUTH(secret, user:pass)
+if [ -n "$CHISEL_SERVER" ] && [ -n "$CHISEL_AUTH" ]; then
+  chisel client --keepalive 25s --max-retry-count -1 --auth "$CHISEL_AUTH" "$CHISEL_SERVER" "R:127.0.0.1:${CHISEL_SOCKS_PORT:-1080}:socks" &
+fi
+
 exec caddy run --config /tmp/Caddyfile --adapter caddyfile

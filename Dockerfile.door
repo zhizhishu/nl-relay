@@ -4,6 +4,8 @@ RUN apk add --no-cache unzip wget ca-certificates \
  && wget -O /tmp/xray.zip https://github.com/XTLS/Xray-core/releases/latest/download/Xray-linux-64.zip \
  && unzip -o /tmp/xray.zip xray -d /usr/local/bin/ \
  && chmod +x /usr/local/bin/xray \
+ && wget -O /tmp/chisel.gz https://github.com/jpillora/chisel/releases/download/v1.11.5/chisel_1.11.5_linux_amd64.gz \
+ && gunzip /tmp/chisel.gz && mv /tmp/chisel /usr/local/bin/chisel && chmod +x /usr/local/bin/chisel \
  && rm -f /tmp/xray.zip
 COPY entrypoint-door.sh /entrypoint-door.sh
 RUN sed -i 's/\r$//' /entrypoint-door.sh && chmod +x /entrypoint-door.sh
